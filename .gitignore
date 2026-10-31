@@ -1,0 +1,25 @@
+# Secrets (NEVER commit these)
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+application-local.yml
+
+# OS and editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Build output
+target/
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
