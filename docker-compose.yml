@@ -1,0 +1,22 @@
+name: vitalsafe-dev
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: vitalsafe-db
+    environment:
+      POSTGRES_DB: vitalsafe_db
+      POSTGRES_USER: vitalsafe_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:5442:5432"
+    volumes:
+      - vitalsafe-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vitalsafe_user -d vitalsafe_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  vitalsafe-data:

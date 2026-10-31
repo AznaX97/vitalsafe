@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repo-checks:
+    name: Repo checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: No secret files are tracked
+        run: |
+          if git ls-files | grep -E '(^|/)(\.env|\.env\.[a-z]+|.*\.pem|.*\.key)$' | grep -vE '\.example$'; then
+            echo "A secret-looking file is tracked by Git"
+            exit 1
+          fi
+
+      - name: Required files exist
+        run: |
+          for f in README.md .gitignore .gitattributes docker-compose.yml .env.example; do
+            test -f "$f" || { echo "Missing $f"; exit 1; }
+          done
+
+      - name: Compose file is valid
+        run: docker compose config -q
+        env:
+          DB_PASSWORD: ci-dummy
