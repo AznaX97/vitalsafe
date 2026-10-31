@@ -24,9 +24,13 @@ Changes go through pull requests from short-lived branches into `main`. Commit m
 
 ## Local setup
 
-```bash
-cp .env.example .env     # then put a strong password in it
-docker compose up -d
-```
+1. `cp .env.example .env` (PowerShell: `Copy-Item .env.example .env`) and put a strong `DB_PASSWORD` in it
+2. `docker compose up -d --wait` starts PostgreSQL on port 5442
+3. Start the API on port 8090:
+   - Windows: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run-backend.ps1`
+   - Other: export the variables from `.env`, then `cd backend && ./mvnw spring-boot:run`
+4. Health check: http://localhost:8090/actuator/health
 
-More instructions arrive with each phase.
+## Tests
+
+`cd backend && ./mvnw verify` (Docker must be running: the tests start a real PostgreSQL with Testcontainers).
