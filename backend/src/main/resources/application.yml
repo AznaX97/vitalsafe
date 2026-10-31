@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: vitalsafe-api
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5442/vitalsafe_db}
+    username: ${DB_USER:vitalsafe_user}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate   # Flyway owns the schema; Hibernate only checks it
+    open-in-view: false
+    show-sql: false        # never log SQL that could contain health data
+  flyway:
+    enabled: true
+
+server:
+  port: 8090
+  error:
+    include-message: never
+    include-stacktrace: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health    # nothing else is exposed
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
