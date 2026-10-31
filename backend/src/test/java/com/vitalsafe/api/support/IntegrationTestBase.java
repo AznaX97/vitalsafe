@@ -42,6 +42,8 @@ public abstract class IntegrationTestBase {
         registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
+        // Generous limit by default, so ordinary tests never hit it. RateLimitApiTest lowers it.
+        registry.add("app.rate-limit.per-minute", () -> "1000");
         // Throwaway signing secret (32 bytes, base64) for tests only
         registry.add("app.jwt.secret",
                 () -> Base64.getEncoder().encodeToString("j".repeat(32).getBytes(StandardCharsets.UTF_8)));
