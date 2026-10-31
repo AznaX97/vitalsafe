@@ -16,7 +16,7 @@ class UserRepositoryTest extends IntegrationTestBase {
     @Autowired
     private UserRepository users;
 
-    private static String uniqueEmail() {
+    protected static String uniqueEmail() {
         return "user-" + UUID.randomUUID() + "@example.com";
     }
 
