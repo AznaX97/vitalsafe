@@ -2,6 +2,7 @@ package com.vitalsafe.api.config;
 
 import com.vitalsafe.api.security.JwtAuthFilter;
 import com.vitalsafe.api.security.JwtService;
+import com.vitalsafe.api.security.RateLimitFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +31,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            JwtService jwtService,
-                                           @Value("${app.cors.allowed-origin}") String allowedOrigin) throws Exception {
+                                           @Value("${app.cors.allowed-origin}") String allowedOrigin,
+                                           @Value("${app.rate-limit.per-minute}") int rateLimitPerMinute) throws Exception {
         http
             // Safe: the API authenticates with Bearer tokens, not cookies
             .csrf(AbstractHttpConfigurer::disable)
@@ -47,6 +49,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated())
             .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+            .addFilterBefore(new RateLimitFilter(rateLimitPerMinute), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new JwtAuthFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
