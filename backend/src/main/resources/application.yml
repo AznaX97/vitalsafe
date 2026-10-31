@@ -15,6 +15,9 @@ spring:
 
 server:
   port: 8090
+  # Behind a reverse proxy, use the client address it reports. Tomcat only trusts this header
+  # from internal addresses, so it cannot be spoofed from the internet.
+  forward-headers-strategy: native
   error:
     include-message: never
     include-stacktrace: never
@@ -29,3 +32,12 @@ management:
       probes:
         enabled: true
       show-details: never
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}     # base64, at least 32 bytes, supplied by the environment
+    expiration-ms: 900000     # access tokens last 15 minutes
+  consent:
+    version: "2026-11-01"     # version of the privacy notice users accept
+  cors:
+    allowed-origin: http://localhost:5173
