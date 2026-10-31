@@ -4,6 +4,10 @@ updates:
     directory: /backend
     schedule:
       interval: weekly
+    groups:
+      jjwt:
+        patterns:
+          - "io.jsonwebtoken:*"
   - package-ecosystem: github-actions
     directory: /
     schedule:
