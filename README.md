@@ -54,3 +54,10 @@ Changes go through pull requests from short-lived branches into `main`. Commit m
 | GET | `/actuator/health` | No | Liveness and readiness |
 
 
+
+## Decisions
+
+- [0001 FHIR approach](docs/decisions/0001-fhir-approach.md)
+- [0002 Authentication](docs/decisions/0002-authentication.md)
+- [0003 Field encryption](docs/decisions/0003-field-encryption.md)
+- [0004 Vitals model](docs/decisions/0004-vitals-model.md)

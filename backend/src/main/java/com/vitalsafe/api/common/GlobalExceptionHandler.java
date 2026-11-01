@@ -10,6 +10,7 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.LinkedHashMap;
@@ -25,15 +26,23 @@ public class GlobalExceptionHandler {
         Map<String, String> fields = new LinkedHashMap<>();
         ex.getBindingResult().getFieldErrors()
                 .forEach(error -> fields.put(error.getField(), error.getDefaultMessage()));
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("error", "Validation failed");
-        body.put("fields", fields);
-        return ResponseEntity.badRequest().body(body);
+        return validationBody(fields);
+    }
+
+    @ExceptionHandler(FieldValidationException.class)
+    public ResponseEntity<Map<String, Object>> handleFieldValidation(FieldValidationException ex) {
+        return validationBody(ex.getFields());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> handleUnreadable(HttpMessageNotReadableException ex) {
         return ResponseEntity.badRequest().body(Map.of("error", "Malformed request body"));
+    }
+
+    // For example a path like /vitals/not-a-uuid, or a query parameter with the wrong type
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, String>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        return ResponseEntity.badRequest().body(Map.of("error", "Invalid value for '" + ex.getName() + "'"));
     }
 
     // Without this, the catch-all below would turn a forbidden request into a 500
@@ -54,5 +63,12 @@ public class GlobalExceptionHandler {
         // Log only the exception type: a message could contain personal or health data
         log.error("Unhandled error: {}", ex.getClass().getName());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Something went wrong"));
+    }
+
+    private static ResponseEntity<Map<String, Object>> validationBody(Map<String, String> fields) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("error", "Validation failed");
+        body.put("fields", fields);
+        return ResponseEntity.badRequest().body(body);
     }
 }
