@@ -1,4 +1,4 @@
-﻿# VitalSafe
+# VitalSafe
 
 **A privacy-first vitals tracker that stores your readings encrypted and exchanges them as standard FHIR.**
 
@@ -24,7 +24,7 @@ Changes go through pull requests from short-lived branches into `main`. Commit m
 
 ## Local setup
 
-1. `cp .env.example .env` (PowerShell: `Copy-Item .env.example .env`) and put a strong `DB_PASSWORD` in it
+1. `cp .env.example .env` (PowerShell: `Copy-Item .env.example .env`) and fill in `DB_PASSWORD`, `JWT_SECRET` and `ENCRYPTION_KEY` (how to generate a key: `docs/decisions/0003-field-encryption.md`)
 2. `docker compose up -d --wait` starts PostgreSQL on port 5442
 3. Start the API on port 8090:
    - Windows: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run-backend.ps1`
