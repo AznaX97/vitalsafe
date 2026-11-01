@@ -1,0 +1,6 @@
+# Who must review changes to which files. With one developer this simply requests your own review.
+# Later collaborators can be added to the sensitive paths below.
+*                                                    @AznaX97
+/backend/src/main/java/com/vitalsafe/api/security/   @AznaX97
+/backend/src/main/resources/db/migration/            @AznaX97
+/.github/                                            @AznaX97
