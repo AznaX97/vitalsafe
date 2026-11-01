@@ -37,6 +37,11 @@ app:
   jwt:
     secret: ${JWT_SECRET}     # base64, at least 32 bytes, supplied by the environment
     expiration-ms: 900000     # access tokens last 15 minutes
+  refresh:                    # NEW
+    expiration-days: 7
+    cookie-secure: false      # true in production (HTTPS only)
+  rate-limit:                 # NEW
+    per-minute: 5             # login and registration attempts per client address
   consent:
     version: "2026-11-01"     # version of the privacy notice users accept
   cors:

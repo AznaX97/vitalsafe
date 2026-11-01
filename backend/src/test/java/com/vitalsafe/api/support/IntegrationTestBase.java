@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "app.rate-limit.per-minute=1000")
 public abstract class IntegrationTestBase {
 
     protected static final String PASSWORD = "Str0ng-Test-Passw0rd";

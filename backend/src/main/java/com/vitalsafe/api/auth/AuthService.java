@@ -1,6 +1,6 @@
 package com.vitalsafe.api.auth;
 
-import com.vitalsafe.api.auth.dto.AuthResponse;
+import com.vitalsafe.api.auth.dto.AuthResult;
 import com.vitalsafe.api.auth.dto.LoginRequest;
 import com.vitalsafe.api.auth.dto.RegisterRequest;
 import com.vitalsafe.api.security.JwtService;
@@ -29,23 +29,26 @@ public class AuthService {
     private final UserRepository users;
     private final PasswordEncoder encoder;
     private final JwtService jwt;
+    private final RefreshTokenService refreshTokens;
     private final String consentVersion;
     private final String dummyHash;
 
     public AuthService(UserRepository users,
                        PasswordEncoder encoder,
                        JwtService jwt,
+                       RefreshTokenService refreshTokens,
                        @Value("${app.consent.version}") String consentVersion) {
         this.users = users;
         this.encoder = encoder;
         this.jwt = jwt;
+        this.refreshTokens = refreshTokens;
         this.consentVersion = consentVersion;
         // Compared against when an email is unknown, so login takes about the same time either way
         this.dummyHash = encoder.encode("not-a-real-password-" + UUID.randomUUID());
     }
 
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
+    public AuthResult register(RegisterRequest request) {
         // Validation already enforces this. It is checked again so the rule cannot be lost by accident.
         if (!Boolean.TRUE.equals(request.consent())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -72,10 +75,10 @@ public class AuthService {
             // Two registrations for the same email at the same moment: the database picks one winner
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
         }
-        return new AuthResponse(jwt.generate(user.getId(), user.getRole()), user.getEmail());
+        return issue(user);
     }
 
-    public AuthResponse login(LoginRequest request) {
+    public AuthResult login(LoginRequest request) {
         Optional<User> found = users.findByEmail(normalize(request.email()));
 
         // Always do one BCrypt comparison, whether or not the account exists
@@ -85,8 +88,30 @@ public class AuthService {
         if (found.isEmpty() || !passwordMatches) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
-        User user = found.get();
-        return new AuthResponse(jwt.generate(user.getId(), user.getRole()), user.getEmail());
+        return issue(found.get());
+    }
+
+    // Deliberately NOT @Transactional: when a used token is replayed, RefreshTokenService revokes every
+    // session and then throws. An outer transaction here would roll that revoking back.
+    public AuthResult refresh(String rawRefreshToken) {
+        if (rawRefreshToken == null || rawRefreshToken.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not logged in");
+        }
+        RefreshTokenService.Rotated rotated = refreshTokens.rotate(rawRefreshToken);
+        User user = users.findById(rotated.userId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unknown user"));
+        return new AuthResult(jwt.generate(user.getId(), user.getRole()), rotated.rawToken(), user.getEmail());
+    }
+
+    public void logout(String rawRefreshToken) {
+        if (rawRefreshToken != null && !rawRefreshToken.isBlank()) {
+            refreshTokens.revoke(rawRefreshToken);
+        }
+    }
+
+    private AuthResult issue(User user) {
+        return new AuthResult(jwt.generate(user.getId(), user.getRole()), refreshTokens.issue(user.getId()),
+                user.getEmail());
     }
 
     private static String normalize(String email) {
