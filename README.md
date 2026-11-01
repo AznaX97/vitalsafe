@@ -33,4 +33,11 @@ Changes go through pull requests from short-lived branches into `main`. Commit m
 
 ## Tests
 
-`cd backend && ./mvnw verify` (Docker must be running: the tests start a real PostgreSQL with Testcontainers).
+`cd backend && ./mvnw verify` (Docker must be running: the tests start a real PostgreSQL with Testcontainers).git 
+## Security notes
+
+- Passwords are hashed with BCrypt and never stored or logged.
+- Access tokens last 15 minutes. Refresh tokens are rotated on every use and stored only as hashes.
+- Login and registration are rate limited per client address.
+- The API must only be reachable through the reverse proxy in production, because the client address is
+  taken from the forwarded header.
