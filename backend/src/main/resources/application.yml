@@ -37,10 +37,12 @@ app:
   jwt:
     secret: ${JWT_SECRET}     # base64, at least 32 bytes, supplied by the environment
     expiration-ms: 900000     # access tokens last 15 minutes
-  refresh:                    # NEW
+  encryption:                 # NEW
+    key: ${ENCRYPTION_KEY}    # base64, exactly 32 bytes, and DIFFERENT from JWT_SECRET
+  refresh:
     expiration-days: 7
     cookie-secure: false      # true in production (HTTPS only)
-  rate-limit:                 # NEW
+  rate-limit:
     per-minute: 5             # login and registration attempts per client address
   consent:
     version: "2026-11-01"     # version of the privacy notice users accept
