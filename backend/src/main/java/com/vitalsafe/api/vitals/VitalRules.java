@@ -55,6 +55,53 @@ public final class VitalRules {
                 null));
     }
 
+    /** Picks the unit for a reading type: the given one if allowed, otherwise the default. Problems go under "unit". */
+    public static String resolveUnit(VitalType type, String unit, Map<String, String> errors) {
+        Spec spec = SPECS.get(type);
+        String allowed = String.join(", ", spec.units().stream().map(UnitRule::unit).toList());
+        String wanted = unit == null ? "" : unit.trim();
+        if (wanted.isEmpty()) {
+            if (spec.unitRequired()) {
+                errors.put("unit", "unit is required for " + type + " (one of: " + allowed + ")");
+                return null;
+            }
+            return spec.units().get(0).unit();
+        }
+        for (UnitRule candidate : spec.units()) {
+            if (candidate.unit().equals(wanted)) {
+                return candidate.unit();
+            }
+        }
+        errors.put("unit", "unit must be one of: " + allowed);
+        return null;
+    }
+
+    /** Checks one bound of a target range with the same limits as a reading. Returns the tidied value, or null. */
+    public static BigDecimal checkBound(VitalType type, String unit, boolean secondary, BigDecimal bound,
+                                        String field, Map<String, String> errors) {
+        if (bound == null) {
+            return null;
+        }
+        Spec spec = SPECS.get(type);
+        boolean whole = spec.wholeNumbers();
+        Range range = null;
+        if (secondary) {
+            if (spec.secondary() == null) {
+                errors.put(field, field + " is not used for " + type);
+                return null;
+            }
+            range = spec.secondary();
+            whole = true;
+        } else {
+            for (UnitRule candidate : spec.units()) {
+                if (candidate.unit().equals(unit)) {
+                    range = candidate.primary();
+                }
+            }
+        }
+        checkNumber(field, field, bound, whole, range, errors);
+        return errors.containsKey(field) ? null : tidy(bound);
+    }
     private VitalRules() {
     }
 
