@@ -56,6 +56,7 @@ Changes go through pull requests from short-lived branches into `main`. Commit m
 | GET | `/api/v1/vitals/{id}` | Bearer | One reading |
 | PUT | `/api/v1/vitals/{id}` | Bearer | Replace a reading |
 | DELETE | `/api/v1/vitals/{id}` | Bearer | Delete a reading |
+| GET | `/api/v1/vitals/summary` | Bearer | Statistics and trends for one type (`type` required; `unit`, `from`, `to`, `zone`, `bucket`) |
 | GET | `/api/v1/vitals/{id}/fhir` | Bearer | One reading as a FHIR R4 Observation |
 | GET | `/api/v1/fhir/export` | Bearer | All your readings (optionally `from` and `to`) as a FHIR Bundle |
 | POST | `/api/v1/vitals/fhir` | Bearer | Import a FHIR Observation as a reading |
@@ -74,3 +75,4 @@ Changes go through pull requests from short-lived branches into `main`. Commit m
 - [0004 Vitals model](docs/decisions/0004-vitals-model.md)
 - [0005 FHIR mapping](docs/decisions/0005-fhir-mapping.md)
 - [0006 Target ranges](docs/decisions/0006-target-ranges.md)
+- [0007 Summaries in the application](docs/decisions/0007-summaries-in-the-application.md)
