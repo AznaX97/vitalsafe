@@ -34,6 +34,15 @@ public class GlobalExceptionHandler {
         return validationBody(ex.getFields());
     }
 
+    @ExceptionHandler(ImportValidationException.class)
+    public ResponseEntity<Map<String, Object>> handleImportValidation(ImportValidationException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("error", "Import failed: nothing was imported");
+        body.put("rowErrors", ex.getTotalErrors());
+        body.put("rows", ex.getRows());
+        return ResponseEntity.badRequest().body(body);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> handleUnreadable(HttpMessageNotReadableException ex) {
         return ResponseEntity.badRequest().body(Map.of("error", "Malformed request body"));

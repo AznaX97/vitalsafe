@@ -11,6 +11,13 @@ import java.util.UUID;
 
 public interface VitalReadingRepository extends JpaRepository<VitalReading, UUID> {
 
+    /** Only the type and time: nothing encrypted is loaded, so nothing needs decrypting. */
+    interface TypeAndTime {
+        VitalType getType();
+
+        Instant getMeasuredAt();
+    }
+
     // Always filter by BOTH id and owner, so one user can never reach another user's reading
     Optional<VitalReading> findByIdAndUserId(UUID id, UUID userId);
 
@@ -25,4 +32,7 @@ public interface VitalReadingRepository extends JpaRepository<VitalReading, UUID
     // A plain list limited by the Pageable (no count query). Used by summaries, which read in time order.
     List<VitalReading> findByUserIdAndTypeAndMeasuredAtBetweenOrderByMeasuredAtAscIdAsc(
             UUID userId, VitalType type, Instant from, Instant to, Pageable pageable);
+
+    // Used to spot duplicates when importing
+    List<TypeAndTime> findByUserIdAndMeasuredAtBetween(UUID userId, Instant from, Instant to);
 }

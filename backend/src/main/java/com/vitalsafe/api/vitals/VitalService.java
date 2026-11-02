@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -82,6 +83,18 @@ public class VitalService {
         readings.delete(findOwned(userId, id));
     }
 
+    /** Validates a request and builds the reading without saving it. Throws FieldValidationException on problems. */
+    public VitalReading prepare(UUID userId, VitalRequest request) {
+        VitalReading reading = new VitalReading();
+        reading.setUserId(userId);
+        apply(reading, request);
+        return reading;
+    }
+
+    @Transactional
+    public List<VitalResponse> saveAll(List<VitalReading> prepared) {
+        return readings.saveAll(prepared).stream().map(VitalResponse::from).toList();
+    }
     /** Returns 404 (not 403) when the reading belongs to someone else, so ids cannot be probed. */
     VitalReading findOwned(UUID userId, UUID id) {
         return readings.findByIdAndUserId(id, userId)
