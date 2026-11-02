@@ -51,6 +51,11 @@ Changes go through pull requests from short-lived branches into `main`. Commit m
 | POST | `/api/v1/auth/refresh` | Cookie | Rotate the refresh token and get a new access token |
 | POST | `/api/v1/auth/logout` | Cookie | Revoke the refresh token and clear the cookie |
 | GET | `/api/v1/me` | Bearer | The signed-in user |
+| POST | `/api/v1/vitals` | Bearer | Add a reading |
+| GET | `/api/v1/vitals` | Bearer | List your readings, newest first (`type`, `from`, `to`, `page`, `size` up to 100) |
+| GET | `/api/v1/vitals/{id}` | Bearer | One reading |
+| PUT | `/api/v1/vitals/{id}` | Bearer | Replace a reading |
+| DELETE | `/api/v1/vitals/{id}` | Bearer | Delete a reading |
 | GET | `/actuator/health` | No | Liveness and readiness |
 
 
