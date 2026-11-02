@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,5 +20,9 @@ public interface VitalReadingRepository extends JpaRepository<VitalReading, UUID
             UUID userId, Instant from, Instant to, Pageable pageable);
 
     Page<VitalReading> findByUserIdAndTypeAndMeasuredAtBetweenOrderByMeasuredAtDescIdAsc(
+            UUID userId, VitalType type, Instant from, Instant to, Pageable pageable);
+
+    // A plain list limited by the Pageable (no count query). Used by summaries, which read in time order.
+    List<VitalReading> findByUserIdAndTypeAndMeasuredAtBetweenOrderByMeasuredAtAscIdAsc(
             UUID userId, VitalType type, Instant from, Instant to, Pageable pageable);
 }
