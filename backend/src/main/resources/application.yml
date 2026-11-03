@@ -18,9 +18,9 @@ server:
   # Behind a reverse proxy, use the client address it reports. Tomcat only trusts this header
   # from internal addresses, so it cannot be spoofed from the internet.
   forward-headers-strategy: native
-  error:
-    include-message: never
-    include-stacktrace: never
+  # error:
+  #   include-message: never
+  #   include-stacktrace: never
 
 management:
   endpoints:
@@ -48,13 +48,7 @@ app:
     version: "2026-11-01"     # version of the privacy notice users accept
   cors:
     allowed-origin: http://localhost:5173
-springdoc:
-  api-docs:
-    enabled: ${OPENAPI_ENABLED:false}   # off unless switched on
-  swagger-ui:
-    enabled: ${OPENAPI_ENABLED:false}
-    tags-sorter: alpha
-    operations-sorter: method
+
 springdoc:
   api-docs:
     enabled: ${OPENAPI_ENABLED:false}   # off unless switched on
