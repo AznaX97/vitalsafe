@@ -79,3 +79,9 @@ Changes go through pull requests from short-lived branches into `main`. Commit m
 - [0006 Target ranges](docs/decisions/0006-target-ranges.md)
 - [0007 Summaries in the application](docs/decisions/0007-summaries-in-the-application.md)
 - [0008 CSV import and export](docs/decisions/0008-csv-import-and-export.md)
+
+## Interactive API docs
+
+Set `OPENAPI_ENABLED=true` in `.env` (never anywhere public) and start the backend, then open
+http://localhost:8090/swagger-ui/index.html. Log in through `POST /api/v1/auth/login`, copy the `token`, press
+**Authorize** and paste it. The raw description is at `/v3/api-docs`. With the switch off, both return 401.

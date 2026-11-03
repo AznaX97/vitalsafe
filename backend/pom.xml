@@ -30,6 +30,7 @@
 		<java.version>21</java.version>
 		<jjwt.version>0.12.6</jjwt.version>
 		<hapi.fhir.version>8.10.1</hapi.fhir.version>
+		<springdoc.version>3.0.3</springdoc.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -149,6 +150,10 @@
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-structures-r4</artifactId>
             <version>${hapi.fhir.version}</version>
+        </dependency>	        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>	</dependencies>
 
 	<build>
