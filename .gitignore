@@ -22,4 +22,6 @@ node_modules/
 dist/
 coverage/
 playwright-report/
-test-results/
+test-results/monitoring/metrics-token
+monitoring/metrics-token
+monitoring/metrics-token
