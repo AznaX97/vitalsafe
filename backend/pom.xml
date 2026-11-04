@@ -154,11 +154,14 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springdoc.version}</version>
-        </dependency>	        <dependency>
+        </dependency>	
+		
+		<dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
             <scope>runtime</scope>
-        </dependency>	</dependencies>
+        </dependency>	
+		</dependencies>
 
 	<build>
 		<plugins>

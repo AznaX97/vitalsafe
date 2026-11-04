@@ -2,6 +2,7 @@ package com.vitalsafe.api.config;
 
 import com.vitalsafe.api.security.JwtAuthFilter;
 import com.vitalsafe.api.security.JwtService;
+import com.vitalsafe.api.security.MetricsTokenFilter;
 import com.vitalsafe.api.security.RateLimitFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +33,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            JwtService jwtService,
                                            @Value("${app.cors.allowed-origin}") String allowedOrigin,
-                                           @Value("${app.rate-limit.per-minute}") int rateLimitPerMinute) throws Exception {
+                                           @Value("${app.rate-limit.per-minute}") int rateLimitPerMinute,
+                                           @Value("${app.metrics.token:}") String metricsToken) throws Exception {
         http
             // Safe: the API authenticates with Bearer tokens, not cookies
             .csrf(AbstractHttpConfigurer::disable)
@@ -45,11 +47,13 @@ public class SecurityConfig {
                 .httpStrictTransportSecurity(hsts -> hsts.disable()))
             .authorizeHttpRequests(a -> a
                 .requestMatchers("/actuator/health/**").permitAll()
+                .requestMatchers("/actuator/prometheus").permitAll()   // guarded by MetricsTokenFilter
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated())
             .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
             .addFilterBefore(new RateLimitFilter(rateLimitPerMinute), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new MetricsTokenFilter(metricsToken), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new JwtAuthFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
