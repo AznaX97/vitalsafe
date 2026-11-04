@@ -2,6 +2,7 @@ package com.vitalsafe.api.vitals;
 
 import com.vitalsafe.api.common.FieldValidationException;
 import com.vitalsafe.api.common.PageResponse;
+import com.vitalsafe.api.metrics.VitalMetrics;
 import com.vitalsafe.api.vitals.dto.VitalRequest;
 import com.vitalsafe.api.vitals.dto.VitalResponse;
 import org.springframework.data.domain.Page;
@@ -26,17 +27,28 @@ public class VitalService {
     private static final Duration CLOCK_TOLERANCE = Duration.ofMinutes(5);
 
     private final VitalReadingRepository readings;
+    private final VitalMetrics metrics;
 
-    public VitalService(VitalReadingRepository readings) {
+    public VitalService(VitalReadingRepository readings, VitalMetrics metrics) {
         this.readings = readings;
+        this.metrics = metrics;
     }
 
+    // @Transactional
+    // public VitalResponse create(UUID userId, VitalRequest request) {
+    //     VitalReading reading = new VitalReading();
+    //     reading.setUserId(userId);   // always the caller, taken from the verified token
+    //     apply(reading, request);
+    //     return VitalResponse.from(readings.save(reading));
+    // }
     @Transactional
     public VitalResponse create(UUID userId, VitalRequest request) {
         VitalReading reading = new VitalReading();
-        reading.setUserId(userId);   // always the caller, taken from the verified token
+        reading.setUserId(userId); // always the caller, taken from the verified token
         apply(reading, request);
-        return VitalResponse.from(readings.save(reading));
+        VitalReading saved = readings.save(reading);
+        metrics.readingSaved(saved.getType(), "api");
+        return VitalResponse.from(saved);
     }
 
     @Transactional(readOnly = true)
