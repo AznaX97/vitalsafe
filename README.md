@@ -92,3 +92,18 @@ http://localhost:8090/swagger-ui/index.html. Log in through `POST /api/v1/auth/l
 `/actuator/prometheus` is guarded by `METRICS_TOKEN` (32 or more characters, from `.env`). A user's login token
 does not open it, and with no token set it stays closed. See [docs/monitoring.md](docs/monitoring.md) for the
 local Prometheus and Grafana dashboards.
+
+## Frontend
+
+React, TypeScript and Vite, in `frontend/`. Start the backend first, then:
+
+```bash
+cd frontend
+npm install
+npm run dev      # http://localhost:5173 (the dev server proxies /api to the backend on port 8090)
+npm test         # unit and component tests
+npm run build    # type check and production build
+```
+
+The access token is kept in memory only, and the refresh cookie is HttpOnly. See
+[docs/decisions/0009-frontend-sessions.md](docs/decisions/0009-frontend-sessions.md).

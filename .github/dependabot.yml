@@ -10,6 +10,21 @@ updates:
       jjwt:
         patterns:
           - "io.jsonwebtoken:*"
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      testing:
+        patterns:
+          - "vitest"
+          - "jsdom"
+          - "@testing-library/*"
+      tanstack:
+        patterns:
+          - "@tanstack/*"
   - package-ecosystem: github-actions
     directory: /
     schedule:
