@@ -12,7 +12,8 @@ class PrometheusClosedByDefaultTest extends IntegrationTestBase {
     @Test
     void withNoTokenConfiguredNothingOpensTheEndpoint() throws Exception {
         assertThat(get("/actuator/prometheus").statusCode()).isEqualTo(401);
-        assertThat(call("GET", "/actuator/prometheus", null, Map.of("Authorization", "Bearer anything-at-all")).statusCode())
+        assertThat(call("GET", "/actuator/prometheus", null, Map.of("Authorization", "Bearer anything-at-all"))
+                .statusCode())
                 .isEqualTo(401);
     }
 }
