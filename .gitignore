@@ -25,3 +25,5 @@ playwright-report/
 test-results/monitoring/metrics-token
 monitoring/metrics-token
 monitoring/metrics-token
+out.txt
+*.out
