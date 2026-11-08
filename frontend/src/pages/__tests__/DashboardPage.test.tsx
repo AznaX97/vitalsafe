@@ -176,7 +176,8 @@ describe("DashboardPage", () => {
     expect(await screen.findByText("70 beats/min")).toBeInTheDocument();
     expect(requests).toContain("POST /api/v1/vitals");
     // The form starts empty again for the next reading
-    expect(screen.getByLabelText("Value")).toHaveValue(null);
+    expect(screen.getByLabelText("Systolic")).toHaveValue(null);
+    expect(screen.getByLabelText("Diastolic")).toHaveValue(null);
   });
 
   it("edits a reading", async () => {
