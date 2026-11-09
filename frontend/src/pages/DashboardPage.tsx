@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { errorMessage } from "../api/client";
 import { useAuth } from "../auth/useAuth";
+import DataToolsPanel from "../data/DataToolsPanel";
 import SummaryPanel from "../summary/SummaryPanel";
+import TargetsPanel from "../targets/TargetsPanel";
 import { TYPE_LABELS, VITAL_TYPES, type Vital, type VitalInput, type VitalType } from "../vitals/types";
 import { useDeleteVital, useSaveVital, useVitalsPage } from "../vitals/useVitals";
 import VitalForm from "../vitals/VitalForm";
@@ -72,6 +74,8 @@ export default function DashboardPage() {
             onSubmit={handleSubmit}
             onCancel={() => setEditing(null)}
           />
+          <TargetsPanel />
+          <DataToolsPanel />
         </div>
 
         <div className="stack">
