@@ -7,7 +7,11 @@ export interface Session {
 
 interface RequestOptions {
   method?: "GET" | "POST" | "PUT" | "DELETE";
+  /** A value sent as JSON. */
   json?: unknown;
+  /** Text sent as it is (for example a CSV file), together with its content type. */
+  body?: string;
+  contentType?: string;
 }
 
 let accessToken: string | null = null;
@@ -17,12 +21,15 @@ let refreshPromise: Promise<Session | null> | null = null;
 export class ApiError extends Error {
   status: number;
   fields?: Record<string, string>;
+  /** The error body the server sent, when it was JSON. Import errors keep their row details here. */
+  body?: unknown;
 
-  constructor(status: number, message: string, fields?: Record<string, string>) {
+  constructor(status: number, message: string, fields?: Record<string, string>, body?: unknown) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.fields = fields;
+    this.body = body;
   }
 }
 
@@ -67,27 +74,28 @@ export async function serverLogout(): Promise<void> {
 
 async function send(path: string, options: RequestOptions): Promise<Response> {
   const headers: Record<string, string> = {};
+  let body: string | undefined;
   if (options.json !== undefined) {
     headers["Content-Type"] = "application/json";
+    body = JSON.stringify(options.json);
+  } else if (options.body !== undefined) {
+    headers["Content-Type"] = options.contentType ?? "text/plain";
+    body = options.body;
   }
   if (accessToken) {
     headers["Authorization"] = `Bearer ${accessToken}`;
   }
   try {
-    return await fetch(`/api/v1${path}`, {
-      method: options.method ?? "GET",
-      headers,
-      body: options.json !== undefined ? JSON.stringify(options.json) : undefined,
-    });
+    return await fetch(`/api/v1${path}`, { method: options.method ?? "GET", headers, body });
   } catch {
     throw new ApiError(0, "Cannot reach the server. Is the backend running?");
   }
 }
 
-export async function api<T>(path: string, options: RequestOptions = {}): Promise<T> {
+// Sends the request. When the access token has expired, refreshes once and retries once.
+// A failed login has no token, so it never takes this path.
+async function request(path: string, options: RequestOptions): Promise<Response> {
   let response = await send(path, options);
-
-  // The access token expired: refresh once, then retry once. A failed login has no token, so it never gets here.
   if (response.status === 401 && accessToken) {
     const session = await refreshSession();
     if (session) {
@@ -96,21 +104,44 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
       onUnauthorized?.();
     }
   }
+  return response;
+}
 
-  let data: unknown = null;
-  if (response.status !== 204) {
-    try {
-      data = await response.json();
-    } catch {
-      data = null;
-    }
+async function failure(response: Response): Promise<ApiError> {
+  let data: unknown;
+  try {
+    data = await response.json();
+  } catch {
+    data = undefined;
   }
+  const body = (data ?? {}) as { error?: string; fields?: Record<string, string> };
+  return new ApiError(response.status, body.error ?? "Request failed", body.fields, data ?? undefined);
+}
 
+export async function api<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const response = await request(path, options);
   if (!response.ok) {
-    const body = (data ?? {}) as { error?: string; fields?: Record<string, string> };
-    throw new ApiError(response.status, body.error ?? "Request failed", body.fields);
+    throw await failure(response);
   }
-  return data as T;
+  if (response.status === 204) {
+    return null as T;
+  }
+  try {
+    return (await response.json()) as T;
+  } catch {
+    return null as T;
+  }
+}
+
+/** Fetches a file, with the same sign-in handling as every other call, and reads its suggested name. */
+export async function apiDownload(path: string): Promise<{ blob: Blob; filename: string }> {
+  const response = await request(path, {});
+  if (!response.ok) {
+    throw await failure(response);
+  }
+  const disposition = response.headers.get("Content-Disposition") ?? "";
+  const match = /filename="?([^";]+)"?/i.exec(disposition);
+  return { blob: await response.blob(), filename: match?.[1] ?? "download" };
 }
 
 /** A message that is safe to show: field problems when there are any, otherwise the server's message. */

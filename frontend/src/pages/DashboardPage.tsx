@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { errorMessage } from "../api/client";
 import { useAuth } from "../auth/useAuth";
+import SummaryPanel from "../summary/SummaryPanel";
 import { TYPE_LABELS, VITAL_TYPES, type Vital, type VitalInput, type VitalType } from "../vitals/types";
 import { useDeleteVital, useSaveVital, useVitalsPage } from "../vitals/useVitals";
 import VitalForm from "../vitals/VitalForm";
@@ -73,35 +74,39 @@ export default function DashboardPage() {
           />
         </div>
 
-        <section className="card">
-          <div className="topbar">
-            <h2>Your readings</h2>
-            <label>
-              Show
-              <select value={type} onChange={(e) => changeType(e.target.value as VitalType | "")}>
-                <option value="">All readings</option>
-                {VITAL_TYPES.map((option) => (
-                  <option key={option} value={option}>
-                    {TYPE_LABELS[option]}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+        <div className="stack">
+          <SummaryPanel />
 
-          {actionError && (
-            <p className="error" role="alert">
-              {actionError}
-            </p>
-          )}
-          {query.isPending && <p className="muted">Loading...</p>}
-          {query.isError && (
-            <p className="error" role="alert">
-              {errorMessage(query.error)}
-            </p>
-          )}
-          {query.data && <VitalList data={query.data} onEdit={setEditing} onDelete={handleDelete} onPage={setPage} />}
-        </section>
+          <section className="card">
+            <div className="topbar">
+              <h2>Your readings</h2>
+              <label>
+                Show
+                <select value={type} onChange={(e) => changeType(e.target.value as VitalType | "")}>
+                  <option value="">All readings</option>
+                  {VITAL_TYPES.map((option) => (
+                    <option key={option} value={option}>
+                      {TYPE_LABELS[option]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            {actionError && (
+              <p className="error" role="alert">
+                {actionError}
+              </p>
+            )}
+            {query.isPending && <p className="muted">Loading...</p>}
+            {query.isError && (
+              <p className="error" role="alert">
+                {errorMessage(query.error)}
+              </p>
+            )}
+            {query.data && <VitalList data={query.data} onEdit={setEditing} onDelete={handleDelete} onPage={setPage} />}
+          </section>
+        </div>
       </div>
     </div>
   );

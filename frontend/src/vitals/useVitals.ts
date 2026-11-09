@@ -23,21 +23,31 @@ export function useVitalsPage(filter: VitalFilter) {
   });
 }
 
-export function useSaveVital() {
+/** Reloads everything that is calculated from the readings. */
+export function useRefreshReadings() {
   const queryClient = useQueryClient();
+  return () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["vitals"] }),
+      queryClient.invalidateQueries({ queryKey: ["summary"] }),
+    ]);
+}
+
+export function useSaveVital() {
+  const refresh = useRefreshReadings();
   return useMutation({
     mutationFn: ({ id, input }: { id?: string; input: VitalInput }) =>
       id
         ? api<Vital>(`/vitals/${id}`, { method: "PUT", json: input })
         : api<Vital>("/vitals", { method: "POST", json: input }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["vitals"] }),
+    onSuccess: refresh,
   });
 }
 
 export function useDeleteVital() {
-  const queryClient = useQueryClient();
+  const refresh = useRefreshReadings();
   return useMutation({
     mutationFn: (id: string) => api<void>(`/vitals/${id}`, { method: "DELETE" }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["vitals"] }),
+    onSuccess: refresh,
   });
 }

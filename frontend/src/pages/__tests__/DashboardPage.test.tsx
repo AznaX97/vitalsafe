@@ -7,6 +7,7 @@ import type { Vital } from "../../vitals/types";
 import DashboardPage from "../DashboardPage";
 
 vi.mock("../../auth/useAuth", () => ({ useAuth: vi.fn() }));
+vi.mock("../../summary/SummaryPanel", () => ({ default: () => null }));
 
 const fetchMock = vi.fn();
 

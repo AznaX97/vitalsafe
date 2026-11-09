@@ -89,3 +89,26 @@ th, td { text-align: left; vertical-align: top; padding: 0.5rem; border-bottom: 
 th { color: var(--muted); font-weight: 600; }
 
 .footer { text-align: center; padding: 1.5rem 1rem; font-size: 0.85rem; }
+.facts { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; }
+.facts div { display: flex; flex-direction: column; }
+.facts dt { font-size: 0.8rem; color: var(--muted); }
+.facts dd { margin: 0; font-weight: 600; }
+
+.chart { width: 100%; height: auto; }
+.chart .grid-line { stroke: var(--border); stroke-width: 1; }
+.chart .axis-label { font-size: 11px; fill: var(--muted); }
+.chart .band-a { fill: rgba(14, 124, 134, 0.14); }
+.chart .band-b { fill: rgba(122, 90, 200, 0.14); }
+.chart .band-line { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 5 4; }
+.chart .series-a .line { stroke: var(--accent); stroke-width: 2; }
+.chart .series-a .dot { fill: var(--accent); }
+.chart .series-a .range { stroke: var(--accent); stroke-width: 2; opacity: 0.35; }
+.chart .series-b .line { stroke: #7a5ac8; stroke-width: 2; stroke-dasharray: 6 3; }
+.chart .series-b .dot { fill: #7a5ac8; }
+.chart .series-b .range { stroke: #7a5ac8; stroke-width: 2; opacity: 0.35; }
+.legend { list-style: none; margin: 0; padding: 0; display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.8rem; color: var(--muted); }
+.swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: middle; }
+.swatch.series-a { background: var(--accent); }
+.swatch.series-b { background: #7a5ac8; }
+details summary { cursor: pointer; }
+.row-errors { margin: 0; padding-left: 1.25rem; font-size: 0.85rem; }
