@@ -107,3 +107,7 @@ npm run build    # type check and production build
 
 The access token is kept in memory only, and the refresh cookie is HttpOnly. See
 [docs/decisions/0009-frontend-sessions.md](docs/decisions/0009-frontend-sessions.md).
+## End-to-end tests
+
+`cd frontend && npm run e2e:infra && npm run e2e` starts its own database (port 5443), backend (8091) and frontend
+(5174), so your development setup is not touched. Stop the test database with `npm run e2e:down`. They also run in CI.
