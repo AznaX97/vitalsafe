@@ -2,7 +2,7 @@ name: vitalsafe-dev
 
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     container_name: vitalsafe-db
     environment:
       POSTGRES_DB: vitalsafe_db
