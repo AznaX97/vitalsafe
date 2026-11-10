@@ -111,3 +111,7 @@ The access token is kept in memory only, and the refresh cookie is HttpOnly. See
 
 `cd frontend && npm run e2e:infra && npm run e2e` starts its own database (port 5443), backend (8091) and frontend
 (5174), so your development setup is not touched. Stop the test database with `npm run e2e:down`. They also run in CI.
+## Production stack
+
+`docker-compose.prod.yml` runs PostgreSQL, the backend and Caddy (automatic HTTPS) with only ports 80 and 443 open.
+How to run it locally, put it on a server, update it and go back: [docs/deployment.md](docs/deployment.md).

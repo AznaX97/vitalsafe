@@ -1,0 +1,46 @@
+name: Production stack
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stack-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Production stack smoke test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+
+      # Throwaway secrets that exist only for this run and are never committed
+      - name: Create a temporary .env.prod
+        run: |
+          {
+            echo "DOMAIN=localhost"
+            echo "HSTS_MAX_AGE=0"
+            echo "DB_PASSWORD=$(openssl rand -hex 16)"
+            echo "JWT_SECRET=$(openssl rand -base64 32)"
+            echo "ENCRYPTION_KEY=$(openssl rand -base64 32)"
+          } > .env.prod
+
+      - name: Build and start the stack
+        run: docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+
+      - name: Smoke test
+        run: bash scripts/smoke-test.sh https://localhost --register
+
+      - name: Show the logs when something failed
+        if: failure()
+        run: docker compose -f docker-compose.prod.yml --env-file .env.prod logs --no-color --tail 200
+
+      - name: Stop the stack and delete its data
+        if: always()
+        run: docker compose -f docker-compose.prod.yml --env-file .env.prod down -v
