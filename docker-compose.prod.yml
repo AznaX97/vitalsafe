@@ -1,0 +1,85 @@
+name: vitalsafe-prod
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: vitalsafe_db
+      POSTGRES_USER: vitalsafe_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env.prod}
+    volumes:
+      - prod-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vitalsafe_user -d vitalsafe_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    logging: *logging
+    # No "ports:" on purpose: the database is not reachable from outside
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/vitalsafe_db
+      DB_USER: vitalsafe_user
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env.prod}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env.prod}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?Set ENCRYPTION_KEY in .env.prod}
+      APP_REFRESH_COOKIE_SECURE: "true"
+      APP_CORS_ALLOWED_ORIGIN: https://${DOMAIN:?Set DOMAIN in .env.prod}
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    healthcheck:
+      # Opens a plain connection and checks the readiness answer, so no extra tools are needed in the image
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8090 && printf 'GET /actuator/health/readiness HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q '\"status\":\"UP\"' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    logging: *logging
+    # No "ports:" on purpose: only the proxy can reach the backend
+
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env.prod}
+      HSTS_MAX_AGE: ${HSTS_MAX_AGE:-0}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - caddy-data:/data
+      - caddy-config:/config
+    security_opt:
+      - no-new-privileges:true
+    logging: *logging
+
+volumes:
+  prod-db-data:
+  caddy-data:
+  caddy-config:
