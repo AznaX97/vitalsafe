@@ -8,7 +8,7 @@ COPY src ./src
 RUN mvn -B -q -DskipTests clean package
 
 # ---- Stage 2: small runtime image, without Maven or the source code ----
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:25-jre
 RUN useradd --system --uid 10001 --no-create-home appuser
 WORKDIR /app
 COPY --from=build /build/target/*.jar app.jar
