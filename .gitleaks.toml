@@ -1,0 +1,12 @@
+title = "VitalSafe secret scanning"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Throwaway values that exist only for tests"
+paths = [
+  '''docker-compose\.e2e\.yml''',
+  '''frontend/playwright\.config\.ts''',
+  '''backend/src/test/.*''',
+]

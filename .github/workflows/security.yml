@@ -1,0 +1,68 @@
+name: Security scans
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 3 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # Scans the whole Git history. The three GIT_CONFIG variables stop git inside the container
+      # from refusing a folder owned by another user.
+      - name: gitleaks
+        run: |
+          docker run --rm -v "$PWD:/repo" \
+            -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e GIT_CONFIG_VALUE_0=/repo \
+            ghcr.io/gitleaks/gitleaks:latest detect --source /repo --config /repo/.gitleaks.toml --redact --no-banner --verbose
+
+  dependencies:
+    name: Dependency and configuration scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Trivy on the repository files
+        run: |
+          docker run --rm -v "$PWD:/work" -w /work aquasec/trivy:latest fs \
+            --scanners vuln,misconfig --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 .
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: npm audit (what ships to browsers)
+        working-directory: frontend
+        run: npm audit --omit=dev --audit-level=high
+
+  images:
+    name: Image scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build the images
+        run: |
+          docker build -t vitalsafe-backend ./backend
+          docker build -t vitalsafe-web ./frontend
+
+      - name: Trivy on the images
+        run: |
+          for image in vitalsafe-backend vitalsafe-web; do
+            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image \
+              --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 "$image"
+          done
