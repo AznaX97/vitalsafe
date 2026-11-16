@@ -44,7 +44,7 @@ jobs:
       - name: Trivy on the repository files
         run: bash scripts/trivy.sh fs --scanners vuln,misconfig --skip-dirs frontend/node_modules --skip-dirs backend/target --skip-dirs frontend/dist --skip-files backend/pom.xml --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 .
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
 
