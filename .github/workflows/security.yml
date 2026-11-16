@@ -31,14 +31,18 @@ jobs:
   dependencies:
     name: Dependency and configuration scan
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v6
 
+      - uses: actions/cache@v5
+        with:
+          path: ~/.cache/trivy
+          key: trivy-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: trivy-${{ runner.os }}-
+
       - name: Trivy on the repository files
-        run: |
-          docker run --rm -v "$PWD:/work" -w /work aquasec/trivy:latest fs \
-            --scanners vuln,misconfig --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 .
+        run: bash scripts/trivy.sh fs --scanners vuln,misconfig --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 .
 
       - uses: actions/setup-node@v6
         with:
@@ -51,9 +55,15 @@ jobs:
   images:
     name: Image scan
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v6
+
+      - uses: actions/cache@v5
+        with:
+          path: ~/.cache/trivy
+          key: trivy-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: trivy-${{ runner.os }}-
 
       - name: Build the images
         run: |
@@ -63,6 +73,5 @@ jobs:
       - name: Trivy on the images
         run: |
           for image in vitalsafe-backend vitalsafe-web; do
-            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image \
-              --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 "$image"
+            bash scripts/trivy.sh image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 "$image"
           done
