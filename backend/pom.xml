@@ -31,6 +31,7 @@
 		<jjwt.version>0.12.6</jjwt.version>
 		<hapi.fhir.version>8.10.1</hapi.fhir.version>
 		<springdoc.version>3.0.3</springdoc.version>
+		<guava.override.version>33.7.2-jre</guava.override.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -161,7 +162,13 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
             <scope>runtime</scope>
         </dependency>	
-		</dependencies>
+		        <!-- Pinned above the version HAPI FHIR brings in: 33.2.1 has a known denial of service (CVE-2026-102554).
+             Remove this once HAPI FHIR ships a fixed Guava. -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.override.version}</version>
+        </dependency>	</dependencies>
 
 	<build>
 		<plugins>

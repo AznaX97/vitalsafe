@@ -1,0 +1,18 @@
+vulnerabilities:
+  - id: CVE-2026-78661
+    statement: >
+      Found in the caddy binary of the official caddy:2-alpine image (golang.org/x/net v0.60.0, fixed in 0.62.0).
+      A denial of service in the x/net HTML parser. This stack only serves static files and proxies requests,
+      so it is not known to be reachable, but that has not been proven. Revisit when the Caddy image is rebuilt
+      upstream, or at the expiry date.
+    expired_at: 2026-12-11
+
+misconfigurations:
+  - id: DS-0002
+    paths:
+      - frontend/Dockerfile
+    statement: >
+      The Caddy container runs as root so it can bind ports 80 and 443 and write its certificate storage.
+      It publishes only those two ports, runs with no-new-privileges, and serves static files and proxies requests.
+      Running Caddy as a non-root user is planned as its own change and has to be tested with the production smoke test.
+    expired_at: 2026-12-31

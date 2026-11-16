@@ -115,3 +115,8 @@ The access token is kept in memory only, and the refresh cookie is HttpOnly. See
 
 `docker-compose.prod.yml` runs PostgreSQL, the backend and Caddy (automatic HTTPS) with only ports 80 and 443 open.
 How to run it locally, put it on a server, update it and go back: [docs/deployment.md](docs/deployment.md).
+## Backups and security scans
+
+[docs/backups.md](docs/backups.md) explains making and testing database backups. Secret and vulnerability scans run
+on every pull request and weekly ([.github/workflows/security.yml](.github/workflows/security.yml)).
+Before real users: [docs/release-checklist.md](docs/release-checklist.md).

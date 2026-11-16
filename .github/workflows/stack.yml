@@ -37,6 +37,10 @@ jobs:
       - name: Smoke test
         run: bash scripts/smoke-test.sh https://localhost --register
 
+      - name: Backup and restore drill
+        run: |
+          bash scripts/backup-db.sh
+          bash scripts/restore-drill.sh "$(ls -t backups/*.dump | head -n 1)"
       - name: Show the logs when something failed
         if: failure()
         run: docker compose -f docker-compose.prod.yml --env-file .env.prod logs --no-color --tail 200

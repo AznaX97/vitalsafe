@@ -1,0 +1,16 @@
+title = "VitalSafe secret scanning"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Throwaway values that exist only for tests"
+paths = [
+  '''docker-compose\.e2e\.yml''',
+  '''frontend/playwright\.config\.ts''',
+  '''backend/src/test/.*''',
+]
+# The password for the in-memory end-to-end database. It protects nothing and is recreated on every run.
+regexes = [
+  '''E2e-Passw0rd-Strong''',
+]
