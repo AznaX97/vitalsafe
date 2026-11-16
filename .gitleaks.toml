@@ -10,3 +10,7 @@ paths = [
   '''frontend/playwright\.config\.ts''',
   '''backend/src/test/.*''',
 ]
+# The password for the in-memory end-to-end database. It protects nothing and is recreated on every run.
+regexes = [
+  '''E2e-Passw0rd-Strong''',
+]
