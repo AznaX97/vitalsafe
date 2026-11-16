@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Runs Trivy in Docker (CI only) with a cache, a long timeout, and retries when the failure is a download problem.
-# A real finding is not retried: it ends the run straight away.
+# Runs Trivy in Docker (CI only) with a cache, a long timeout, and retries for download problems.
+# A real finding is not retried, and neither is a rate limit: retrying a blocked address makes the block longer.
 # Usage: bash scripts/trivy.sh <trivy arguments>
 set -u
 cache="${TRIVY_CACHE_DIR:-$HOME/.cache/trivy}"
@@ -15,6 +15,10 @@ for attempt in 1 2 3; do
     aquasec/trivy:latest "$@" --timeout 15m "${ignore[@]}" 2>&1 | tee "$log"
   code=${PIPESTATUS[0]}
   [ "$code" -eq 0 ] && exit 0
+  if grep -q "429 Too Many Requests" "$log"; then
+    echo "A package repository is rate limiting this address. Not retrying, because that would make the block longer."
+    exit "$code"
+  fi
   if grep -q "FATAL" "$log"; then
     echo "Trivy could not run (attempt $attempt of 3). Waiting before trying again."
     sleep 20
