@@ -124,9 +124,3 @@ How to run it locally, put it on a server, update it and go back: [docs/deployme
 [docs/backups.md](docs/backups.md) explains making and testing database backups. Secret and vulnerability scans run
 on every pull request and weekly ([.github/workflows/security.yml](.github/workflows/security.yml)).
 Before real users: [docs/release-checklist.md](docs/release-checklist.md).
-- [0011 Account lifecycle](docs/decisions/0011-account-lifecycle.md)
-- [Email](docs/mail.md)
-- [0011 Account lifecycle](docs/decisions/0011-account-lifecycle.md)
-- [Email](docs/mail.md)
-- [0011 Account lifecycle](docs/decisions/0011-account-lifecycle.md)
-- [Email](docs/mail.md)

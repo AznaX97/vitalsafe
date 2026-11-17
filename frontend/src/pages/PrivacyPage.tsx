@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { CONTACT_EMAIL, LAST_UPDATED, OPERATOR } from "../config/legal";
+import { BACKUP_RETENTION_DAYS, CONTACT_EMAIL, LAST_UPDATED, OPERATOR } from "../config/legal";
 
 export default function PrivacyPage() {
   return (
@@ -124,8 +124,8 @@ export default function PrivacyPage() {
             standard FHIR data.
           </li>
           <li>
-            <strong>Deleting your whole account is not available in the app yet.</strong> To have your account and all its data
-            removed, contact {CONTACT_EMAIL}.
+            <strong>You can delete your whole account in the app</strong> (open Account from your email address at the top). It removes your login, your readings and your target ranges from the database straight away.
+            Backups made before you delete your account may still contain your data until they are deleted, which happens after {BACKUP_RETENTION_DAYS} days. You can also ask us at {CONTACT_EMAIL}.
           </li>
         </ul>
         <p>

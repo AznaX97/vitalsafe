@@ -26,7 +26,8 @@ describe("PrivacyPage", () => {
     renderPrivacy();
 
     expect(screen.getByText("This is not end-to-end encryption.")).toBeInTheDocument();
-    expect(screen.getByText(/Deleting your whole account is not available in the app yet/)).toBeInTheDocument();
+    expect(screen.getByText(/You can delete your whole account in the app/)).toBeInTheDocument();
+    expect(screen.getByText(/Backups made before you delete your account/)).toBeInTheDocument();
     expect(screen.getByText(/Plain text, because the database must sort and filter them/)).toBeInTheDocument();
   });
 
