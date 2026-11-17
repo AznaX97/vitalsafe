@@ -28,7 +28,8 @@ public abstract class IntegrationTestBase {
 
     protected static final String PASSWORD = "Str0ng-Test-Passw0rd";
 
-    // One container shared by every test class (started once, removed when the JVM exits)
+    // One container shared by every test class (started once, removed when the JVM
+    // exits)
     private static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer("postgres:16-alpine");
     private static final HttpClient HTTP = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
     private static final AtomicInteger IP_COUNTER = new AtomicInteger();
@@ -42,7 +43,8 @@ public abstract class IntegrationTestBase {
         registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
-        // Throwaway encryption key (32 bytes, base64) for tests only, different from the signing secret
+        // Throwaway encryption key (32 bytes, base64) for tests only, different from
+        // the signing secret
         registry.add("app.encryption.key",
                 () -> Base64.getEncoder().encodeToString("e".repeat(32).getBytes(StandardCharsets.UTF_8)));
         // Throwaway signing secret (32 bytes, base64) for tests only
@@ -56,11 +58,15 @@ public abstract class IntegrationTestBase {
     @Autowired
     protected JdbcTemplate jdbc;
 
-    protected record Session(String email, String accessToken, String refreshToken) {}
+    protected record Session(String email, String accessToken, String refreshToken) {
+    }
 
     // ---------- HTTP ----------
 
-    /** Every call comes from its own fake client address, so tests never share a rate-limit bucket. */
+    /**
+     * Every call comes from its own fake client address, so tests never share a
+     * rate-limit bucket.
+     */
     protected HttpResponse<String> call(String method, String path, String body, Map<String, String> headers)
             throws Exception {
         HttpRequest.Builder builder = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + path))
@@ -120,7 +126,8 @@ public abstract class IntegrationTestBase {
                 cookieValue(response, "refresh_token"));
     }
 
-    // ---------- tiny JSON and cookie helpers (no dependency on a JSON library) ----------
+    // ---------- tiny JSON and cookie helpers (no dependency on a JSON library)
+    // ----------
 
     protected static String json(Object... pairs) {
         StringBuilder out = new StringBuilder("{");
