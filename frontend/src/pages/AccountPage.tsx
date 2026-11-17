@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api, errorMessage } from "../api/client";
 import { useAuth } from "../auth/useAuth";
+import { setFlash } from "../lib/flash";
 
 export default function AccountPage() {
   const { email, endSession } = useAuth();
@@ -28,9 +29,10 @@ export default function AccountPage() {
     setChanging(true);
     try {
       await api("/account/password", { method: "POST", json: { currentPassword: current, newPassword: next } });
-      // The server ended every session. Go to the login page first, so the notice is shown, then forget the session here.
-      navigate("/login", { state: { notice: "Your password was changed. Log in again with the new one." } });
+      // The server ended every session. The notice is kept in a variable, because ending the session makes this protected page redirect to the login page by itself.
+      setFlash("Your password was changed. Log in again with the new one.");
       endSession();
+      navigate("/login", { replace: true });
     } catch (caught) {
       setChangeError(errorMessage(caught));
       setChanging(false);
@@ -43,8 +45,9 @@ export default function AccountPage() {
     setDeleting(true);
     try {
       await api("/account/delete", { method: "POST", json: { password: deletePassword } });
-      navigate("/login", { state: { notice: "Your account and all its data were deleted." } });
+      setFlash("Your account and all its data were deleted.");
       endSession();
+      navigate("/login", { replace: true });
     } catch (caught) {
       setDeleteError(errorMessage(caught));
       setDeleting(false);

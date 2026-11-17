@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { errorMessage } from "../api/client";
 import { useAuth } from "../auth/useAuth";
+import { clearFlash, peekFlash } from "../lib/flash";
 
 export default function AuthPage({ mode }: { mode: "login" | "register" }) {
   const isRegister = mode === "register";
@@ -10,7 +11,12 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
   const [password, setPassword] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState("");
-  const notice = (useLocation().state as { notice?: string } | null)?.notice;
+  const routed = (useLocation().state as { notice?: string } | null)?.notice;
+  const [flash] = useState(() => peekFlash());
+  const notice = routed ?? flash ?? undefined;
+  useEffect(() => {
+    clearFlash();   // shown once, then forgotten
+  }, []);
   const [busy, setBusy] = useState(false);
 
   if (loading) {

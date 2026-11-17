@@ -1,8 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useAuth, type AuthState } from "../../auth/useAuth";
+import { clearFlash, peekFlash } from "../../lib/flash";
 import AccountPage from "../AccountPage";
 
 vi.mock("../../auth/useAuth", () => ({ useAuth: vi.fn() }));
@@ -15,7 +16,7 @@ function json(status: number, body: unknown): Response {
 }
 
 function LoginProbe() {
-  const notice = (useLocation().state as { notice?: string } | null)?.notice;
+  const notice = peekFlash();
   return <p>Login page: {notice}</p>;
 }
 
@@ -34,6 +35,7 @@ function renderPage() {
 beforeEach(() => {
   fetchMock.mockReset();
   endSession.mockReset();
+  clearFlash();
   vi.stubGlobal("fetch", fetchMock);
   vi.mocked(useAuth).mockReturnValue({ email: "me@example.com", endSession } as unknown as AuthState);
 });
