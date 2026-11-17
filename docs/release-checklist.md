@@ -2,7 +2,9 @@
 
 ## Product gaps (Phase 6)
 
-- [ ] Change password, password reset and deleting your own account exist (the privacy notice says deletion is by request today)
+- [x] Change password, password reset and deleting your own account exist
+- [ ] An SMTP provider is configured (docs/mail.md), and named in the privacy notice
+- [ ] Backups older than the retention period in the privacy notice are deleted automatically
 - [ ] Metrics are merged and guarded by a token
 - [ ] Registering a taken email still reveals that the account exists. Decide whether that is acceptable.
 

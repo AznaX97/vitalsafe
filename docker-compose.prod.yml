@@ -38,6 +38,7 @@ services:
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:?Set ENCRYPTION_KEY in .env.prod}
       APP_REFRESH_COOKIE_SECURE: "true"
       APP_CORS_ALLOWED_ORIGIN: https://${DOMAIN:?Set DOMAIN in .env.prod}
+      APP_FRONTEND_BASE_URL: https://${DOMAIN}
     read_only: true
     tmpfs:
       - /tmp
