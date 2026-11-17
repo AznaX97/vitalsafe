@@ -51,6 +51,10 @@ Changes go through pull requests from short-lived branches into `main`. Commit m
 | POST | `/api/v1/auth/refresh` | Cookie | Rotate the refresh token and get a new access token |
 | POST | `/api/v1/auth/logout` | Cookie | Revoke the refresh token and clear the cookie |
 | GET | `/api/v1/me` | Bearer | The signed-in user |
+| POST | `/api/v1/auth/forgot-password` | none | Ask for a password reset link by email (always answers 202) |
+| POST | `/api/v1/auth/reset-password` | none | Choose a new password with the emailed token |
+| POST | `/api/v1/account/password` | Bearer | Change your password (ends all sessions) |
+| POST | `/api/v1/account/delete` | Bearer | Delete your account and all its data (needs your password) |
 | POST | `/api/v1/vitals` | Bearer | Add a reading |
 | GET | `/api/v1/vitals` | Bearer | List your readings, newest first (`type`, `from`, `to`, `page`, `size` up to 100) |
 | GET | `/api/v1/vitals/{id}` | Bearer | One reading |
@@ -120,3 +124,5 @@ How to run it locally, put it on a server, update it and go back: [docs/deployme
 [docs/backups.md](docs/backups.md) explains making and testing database backups. Secret and vulnerability scans run
 on every pull request and weekly ([.github/workflows/security.yml](.github/workflows/security.yml)).
 Before real users: [docs/release-checklist.md](docs/release-checklist.md).
+- [0011 Account lifecycle](docs/decisions/0011-account-lifecycle.md)
+- [Email](docs/mail.md)
