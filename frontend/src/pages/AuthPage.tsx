@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { errorMessage } from "../api/client";
 import { useAuth } from "../auth/useAuth";
 
@@ -10,6 +10,7 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
   const [password, setPassword] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState("");
+  const notice = (useLocation().state as { notice?: string } | null)?.notice;
   const [busy, setBusy] = useState(false);
 
   if (loading) {
@@ -60,6 +61,11 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
           />
         </label>
         {isRegister && <p className="hint">At least 12 characters.</p>}
+        {!isRegister && (
+          <p className="hint">
+            <Link to="/forgot-password">Forgot your password?</Link>
+          </p>
+        )}
 
         {isRegister && (
           <label className="consent">
@@ -74,6 +80,8 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
             </span>
           </label>
         )}
+
+        {notice && !error && <p role="status">{notice}</p>}
 
         {error && (
           <p className="error" role="alert">

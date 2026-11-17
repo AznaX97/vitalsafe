@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { errorMessage } from "../api/client";
 import { useAuth } from "../auth/useAuth";
 import DataToolsPanel from "../data/DataToolsPanel";
@@ -59,7 +60,7 @@ export default function DashboardPage() {
       <header className="topbar">
         <h1>VitalSafe</h1>
         <div className="row">
-          <span className="muted">{email}</span>
+          <Link to="/account" title="Your account">{email}</Link>
           <button type="button" className="secondary" onClick={() => void logout()}>
             Log out
           </button>
