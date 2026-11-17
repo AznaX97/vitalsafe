@@ -14,7 +14,7 @@ const backendEnv = {
   JWT_SECRET: Buffer.alloc(32, "j").toString("base64"),
   ENCRYPTION_KEY: Buffer.alloc(32, "e").toString("base64"),
   APP_CORS_ALLOWED_ORIGIN: "http://localhost:5174",
-  APP_RATE_LIMIT_PER_MINUTE: "1000",
+  APP_RATE_LIMIT_PER_MINUTE: "1000",  SPRING_MAIL_HOST: "127.0.0.1",  SPRING_MAIL_PORT: "1125",  APP_FRONTEND_BASE_URL: "http://localhost:5174",  APP_THROTTLE_MULTIPLIER: "100",
 };
 
 export default defineConfig({

@@ -48,7 +48,7 @@ export async function loginViaUi(page: Page, email: string, password: string) {
 export function labelled(page: Page, text: string) {
   return page.getByLabel(new RegExp(`^${text}`));
 }
-const MAIL_API = "http://localhost:8125/api/v1";
+const MAIL_API = "http://127.0.0.1:8125/api/v1";
 
 // Waits for an email to the address to arrive in the test mail server, and returns its text
 export async function latestMailBody(request: APIRequestContext, address: string): Promise<string> {
