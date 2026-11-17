@@ -27,6 +27,9 @@ management:
     web:
       exposure:
         include: health,prometheus    # nothing else is exposed
+  health:
+    mail:
+      enabled: false   # no mail health check: the app does not depend on the mail server
   endpoint:
     health:
       probes:
@@ -44,6 +47,10 @@ app:
   refresh:
     expiration-days: 7
     cookie-secure: false      # true in production (HTTPS only)
+  frontend:
+    base-url: ${APP_FRONTEND_BASE_URL:http://localhost:5173}   # where the links in emails point
+  mail:
+    from: ${APP_MAIL_FROM:no-reply@vitalsafe.local}
   rate-limit:
     per-minute: 5             # login and registration attempts per client address
   consent:
