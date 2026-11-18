@@ -51,7 +51,13 @@ test("a forgotten password can be reset with the emailed link, once", async ({ p
   await page.goto("/login");
   await page.getByRole("link", { name: "Forgot your password?" }).click();
   await page.getByLabel("Email", { exact: true }).fill(user.email);
-  await page.getByRole("button", { name: "Send reset link" }).click();
+
+  // Wait for the server's answer first, so a failure says what the server said and not only that a message is missing
+  const [answer] = await Promise.all([
+    page.waitForResponse((response) => response.url().includes("/auth/forgot-password")),
+    page.getByRole("button", { name: "Send reset link" }).click(),
+  ]);
+  expect(answer.status(), `forgot-password answered: ${await answer.text()}`).toBe(202);
   await expect(page.getByRole("status")).toContainText("a reset link is on its way");
 
   const link = resetLinkIn(await latestMailBody(request, user.email));
