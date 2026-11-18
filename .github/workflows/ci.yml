@@ -120,8 +120,12 @@ jobs:
       - name: Make Maven wrapper executable
         run: chmod +x backend/mvnw
 
-      - name: Start the test database
-        run: docker compose -f docker-compose.e2e.yml up -d --wait
+      - name: Start the test database and the test mail server
+        run: |
+          docker compose -f docker-compose.e2e.yml up -d --wait
+          docker compose -f docker-compose.e2e.yml ps
+          curl -sS --retry 10 --retry-connrefused --retry-delay 2 http://127.0.0.1:8125/api/v1/info > /dev/null
+          echo "The test mail server answers"
 
       - name: Install frontend dependencies
         working-directory: frontend
@@ -133,7 +137,13 @@ jobs:
 
       - name: Run the end-to-end tests
         working-directory: frontend
+        env:
+           APP_RATE_LIMIT_PER_MINUTE: 1000
         run: npx playwright test
+
+      - name: Show the end-to-end database and mail server logs on failure
+        if: failure()
+        run: docker compose -f docker-compose.e2e.yml logs --no-color --tail 100
 
       - name: Upload the Playwright report on failure
         if: failure()

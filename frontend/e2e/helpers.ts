@@ -48,3 +48,24 @@ export async function loginViaUi(page: Page, email: string, password: string) {
 export function labelled(page: Page, text: string) {
   return page.getByLabel(new RegExp(`^${text}`));
 }
+const MAIL_API = "http://127.0.0.1:8125/api/v1";
+
+// Waits for an email to the address to arrive in the test mail server, and returns its text
+export async function latestMailBody(request: APIRequestContext, address: string): Promise<string> {
+  for (let attempt = 0; attempt < 30; attempt++) {
+    const search = await request.get(`${MAIL_API}/search?query=${encodeURIComponent(`to:${address}`)}`);
+    const found = (await search.json()) as { messages?: { ID: string }[] };
+    if (found.messages && found.messages.length > 0) {
+      const message = await request.get(`${MAIL_API}/message/${found.messages[0].ID}`);
+      return ((await message.json()) as { Text: string }).Text;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  throw new Error(`No email arrived for ${address}`);
+}
+
+export function resetLinkIn(mailText: string): string {
+  const match = /(http:\/\/localhost:5174\/reset-password#token=[A-Za-z0-9_-]+)/.exec(mailText);
+  expect(match, "a reset link in the email").not.toBeNull();
+  return (match as RegExpExecArray)[1];
+}

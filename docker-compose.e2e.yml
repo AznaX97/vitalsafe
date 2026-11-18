@@ -17,3 +17,15 @@ services:
       interval: 2s
       timeout: 3s
       retries: 30
+
+  # Catches the emails the backend sends, so the tests can read the reset link
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "127.0.0.1:1125:1025"
+      - "127.0.0.1:8125:8025"
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
