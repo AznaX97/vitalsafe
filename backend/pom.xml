@@ -31,7 +31,7 @@
 		<jjwt.version>0.12.6</jjwt.version>
 		<hapi.fhir.version>8.10.1</hapi.fhir.version>
 		<springdoc.version>3.0.3</springdoc.version>
-		<guava.override.version>33.7.2-jre</guava.override.version>
+		<guava.override.version>33.8.0-jre</guava.override.version>
 	</properties>
 	<dependencies>
 		<dependency>
